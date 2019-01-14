@@ -53,6 +53,7 @@ public class Injector {
 }
 ```
 &emsp;&emsp;这也是本框架唯一通过反射方式来实现的地方。
+
 &emsp;&emsp;在编译器时期，APT会扫面每个被`Moudle`标记的类，然后对应着会生成一个Java类，上面代码的作用就是调用生成的Java类的`inject`方法进行赋值。下面是一个Demo代码：
 ```
 public class MainActivity_Inject {

@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
 &emsp;&emsp;整个注入过程就完成了。
 # 4. 1.2.x新特性
 &emsp;&emsp;`Provides`注解新增一个`deepProvides`属性，默认为false。当`deepProvides`为true，表示当前注入的对象所在类的所注入对象可以作为当前注入对象所在Context的注入对象。形象的说，假设A类有一个里面B类对象被`Provides`注解标记，同时B类也是Context，如果`deepProvides`为true，B类的注入源可以通过A类找到，也就是，一个`Module`被标记在A类取得注入源，此时可以通过A类从B类中需要注入源。简而言之，就是深搜(广搜)思想。
+
 &emsp;&emsp;例如，`Context01`的代码：
 ```
 public class Context01 {

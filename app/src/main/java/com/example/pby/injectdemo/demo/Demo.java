@@ -4,5 +4,5 @@ import com.example.annation.Provides;
 
 public class Demo {
     @Provides("demoDemoString")
-    public String demoDemoString;
+    public Object demoDemoString = "string";
 }

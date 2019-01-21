@@ -2,7 +2,7 @@ package com.example.processor.writer;
 
 import com.example.annation.Module;
 import com.example.processor.Constants;
-import com.example.processor.ElementNode;
+import com.example.processor.node.ElementNode;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -51,7 +51,7 @@ public class JavaFileWriter {
                 final ElementNode injectChildNode = injectRootNode.getChild(injectChildNodeKey);
                 final String sourcePath = providesRootNode.lookUp(injectChildNode.getId());
                 if (sourcePath != null) {
-                    methodBuilder.addStatement(generateCodeBlock(injectChildNode.getSimpleName(), sourcePath));
+                    methodBuilder.addStatement(generateCodeBlock(injectChildNode, sourcePath));
                 }
             }
             TypeSpec typeSpec = typeSpecBuilder.addMethod(methodBuilder.build()).build();
@@ -88,7 +88,7 @@ public class JavaFileWriter {
         return null;
     }
 
-    private CodeBlock generateCodeBlock(String target, String source) {
-        return CodeBlock.builder().add("$L.$L = $L.$L", Constants.TARGET, target, Constants.SOURCE, source).build();
+    private CodeBlock generateCodeBlock(ElementNode injectNode, String sourcePath) {
+        return CodeBlock.builder().add("$L.$L = ($L)($L.$L)", Constants.TARGET, injectNode.getSimpleName(), injectNode.getType(), Constants.SOURCE, sourcePath).build();
     }
 }

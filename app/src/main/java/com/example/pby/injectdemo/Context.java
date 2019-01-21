@@ -8,4 +8,7 @@ public class Context {
 
     @Provides(value = "contextString2")
     public String string2;
+
+    @Provides(value = "int")
+    public int code = 2;
 }

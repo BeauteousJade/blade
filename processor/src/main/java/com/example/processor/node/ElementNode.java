@@ -1,4 +1,4 @@
-package com.example.processor;
+package com.example.processor.node;
 
 import com.example.processor.util.StringUtils;
 
@@ -180,6 +180,6 @@ public class ElementNode {
 
     @Override
     public String toString() {
-        return "[id = " + id + " type = " + type + " simpleName = " + simpleName + " nextMap = " + nextMap+ "]";
+        return "[id = " + id + " type = " + type + " simpleName = " + simpleName + " nextMap = " + nextMap + "]";
     }
 }

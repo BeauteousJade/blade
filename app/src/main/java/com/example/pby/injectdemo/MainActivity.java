@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     String[] strings1;
     @Inject("demoDemoString")
     String demoDemoString;
+    @Inject("int")
+    int code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

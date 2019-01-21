@@ -119,6 +119,7 @@ public class Context01 {
 }
 ```
 &emsp;&emsp;`Context01`内部有一个`Context02`对象，请注意我们将`deepProvides`为true。
+
 &emsp;&emsp;然后我们来看看`Context02`的代码：
 ```
 public class Context02 {

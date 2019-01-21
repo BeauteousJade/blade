@@ -13,8 +13,8 @@ allprojects {
 ```
 dependencies {
     // ······
-    implementation 'com.github.BeauteousJade.blade:inject:1.0'
-    annotationProcessor 'com.github.BeauteousJade.blade:processor:1.0'
+    implementation 'com.github.BeauteousJade.blade:inject:1.2.3'
+    annotationProcessor 'com.github.BeauteousJade.blade:processor:1.2.3'
 }
 ```
 
@@ -27,9 +27,9 @@ dependencies {
 |Inject|如果一个变量需要注入，那么该变量会被标记`Inject`，表示注入的目标|比如上面的B类对象，必须标记`Inject`。该注解默认带一个String参数(可以不填)， 表示以此String字符串为id从注入源取得注入对象;不填表示默认以该对象的`ClassName`为id。因此，在同一个Module下，不能同时有两个相同类型的变量的`Inject`注解不填id。|
 |Provides|如果一个变量需要被注入，该变量会标记`Provides`注解。需要被注入的变量必须放在一个Context（Object类型，也就是任意类型）里面；反之，如果一个类里面有一个变量标记了`Provides`注解，表示该类可以作为一个Context|`Provides`默认带一个String参数，表示注入的id，跟`Inject`的参数相对应。|
 
-&emsp;&emsp;如果使用注解成功的标记我们想要被注入和注入的变量，我们可以在通过调用`Injector`的`inject(Object target, Object source)`方法进行注入操作的最后一步，也只有经过这一步，想要注入的变量才会成功赋值。如下是`Injector`的代码：
+&emsp;&emsp;如果使用注解成功的标记我们想要被注入和注入的变量，我们可以在通过调用`Blade`的`inject(Object target, Object source)`方法进行注入操作的最后一步，也只有经过这一步，想要注入的变量才会成功赋值。如下是`Blade`的代码：
 ```
-public class Injector {
+public class Blade {
 
     public static void inject(Object target, Object source) {
         String className = target.getClass().getName() + "_Inject";
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Injector.inject(this, new Context());
+        Blade.inject(this, new Context());
     }
     // ······
 }
@@ -140,13 +140,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Blade.inject(this, new Context01());
     }
 }
 ```
 &emsp;&emsp;虽然我们的`Module`设置是从`Context01`里面获取注入源，但是`Context01`并没有id为`string1`的注入源，所以得从`deepProvides`为true的类里面去找，所以这里会在`Context02`里面找到。
 
 &emsp;&emsp;我们可以将`Context01`称为`父Context`，`Context02`称为`子Context`。
-#### &emsp;&emsp;注意点：
+### &emsp;&emsp;注意点：
 >1. 理论上来说，不同Context里面可以存在相同id的注入源。但是需要注意的是，由于框架遍历Context树采用的是广搜算法，所以在搜索时，找到的第一个相匹配id的注入源就会停止搜索。为了保证结果的正确性，在同一个Context树里面，id最好是具有唯一性，当然如果你能保证匹配正确，可以使用多id。
 >2. 在构建Context树时，千万不要构成环路。也就是说，一个`子Context`将`父Context`作为自己的注入源。这种情况是必须避免的。
 

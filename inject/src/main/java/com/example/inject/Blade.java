@@ -3,7 +3,7 @@ package com.example.inject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class Injector {
+public class Blade {
 
     public static void inject(Object target, Object source) {
         String className = target.getClass().getName() + "_Inject";

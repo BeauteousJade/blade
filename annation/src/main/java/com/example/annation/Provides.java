@@ -10,4 +10,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface Provides {
     String value() default "";
+
+    boolean deepProvides() default false;
 }

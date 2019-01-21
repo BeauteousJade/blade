@@ -1,10 +1,8 @@
 package com.example.pby.injectdemo;
 
-import com.example.annation.Module;
-import com.example.annation.Inject;
+import com.example.annation.Provides;
 
-@Module(Context.class)
 public class Demo {
-    @Inject
-    String string3;
+    @Provides(deepProvides = true, value = "demoString")
+    Demo3 string3;
 }

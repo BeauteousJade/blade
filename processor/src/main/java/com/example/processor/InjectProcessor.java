@@ -2,6 +2,8 @@ package com.example.processor;
 
 import com.example.annation.Inject;
 import com.example.annation.Provides;
+import com.example.processor.util.ElementUtils;
+import com.example.processor.writer.JavaFileWriter;
 import com.google.auto.service.AutoService;
 
 import java.util.HashMap;
@@ -52,55 +54,80 @@ public class InjectProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        Map<String, Map<String, Element>> provideMap = new HashMap<>();
-        Map<TypeElement, Map<String, Element>> injectMap = new HashMap<>();
         // 处理@Provides
-        processProvide(roundEnvironment.getElementsAnnotatedWith(Provides.class), provideMap);
+        Map<String, ElementNode> provideMap = processProvide(roundEnvironment.getElementsAnnotatedWith(Provides.class));
         // 处理 @Inject
-        processInject(roundEnvironment.getElementsAnnotatedWith(Inject.class), injectMap);
+        Map<String, ElementNode> injectMap = processInject(roundEnvironment.getElementsAnnotatedWith(Inject.class));
         // 生成Java文件
-        JavaFileWriter javaFileUtil = new JavaFileWriter(mElementUtils, mFiler);
+        JavaFileWriter javaFileUtil = new JavaFileWriter(mFiler);
         javaFileUtil.mMessager = mMessager;
         javaFileUtil.writeJavaFile(provideMap, injectMap);
         return true;
     }
 
-    private void processProvide(Set<? extends Element> elements, Map<String, Map<String, Element>> provideMap) {
+    private Map<String, ElementNode> processProvide(Set<? extends Element> elements) {
+
+        final Map<String, ElementNode> provideMap = processAnnotation(elements, element -> {
+            final Provides provides = element.getAnnotation(Provides.class);
+            final String elementId = provides.value().equals("") ? element.asType().toString() : provides.value();
+            ElementNode childNode = new ElementNode(elementId, element.getSimpleName().toString(), element.asType().toString(), ElementUtils.getPackageName(mElementUtils, element));
+            childNode.addAnnotation(Provides.class, provides);
+            return childNode;
+        });
+        final Set<String> rooNodeKeySet = provideMap.keySet();
+        for (String key : rooNodeKeySet) {
+            final ElementNode rootNode = provideMap.get(key);
+            final Map<String, ElementNode> nextMap = rootNode.getNextMap();
+            final Set<String> childNodeKeySet = nextMap.keySet();
+            for (String childNodeKey : childNodeKeySet) {
+                ElementNode childNode = nextMap.get(childNodeKey);
+                Provides provides = childNode.getAnnotation(Provides.class);
+                if (provides.deepProvides()) {
+                    if (provideMap.get(childNode.getType()) != null) {
+                        childNode.setNextMap(provideMap.get(childNode.getType()).getNextMap());
+                    }
+                }
+            }
+        }
+        return provideMap;
+    }
+
+    private Map<String, ElementNode> processInject(Set<? extends Element> elements) {
+        return processAnnotation(elements, element -> {
+            final Inject inject = element.getAnnotation(Inject.class);
+            final String elementId = inject.value().equals("") ? element.asType().toString() : inject.value();
+            return new ElementNode(elementId, element.getSimpleName().toString(), element.asType().toString(), ElementUtils.getPackageName(mElementUtils, element));
+        });
+    }
+
+
+    private Map<String, ElementNode> processAnnotation(Set<? extends Element> elements, Callback callback) {
+        final Map<String, ElementNode> map = new HashMap<>();
         for (Element element : elements) {
-            TypeElement typeElement = (TypeElement) element.getEnclosingElement();
-            String elementMapKey = typeElement.getQualifiedName().toString();
-            Map<String, Element> elementMap = provideMap.get(elementMapKey);
-            Provides provides = element.getAnnotation(Provides.class);
-            String elementKey = provides.value();
-            if (elementKey.equals("")) {
-                elementKey = element.asType().toString();
+            final TypeElement typeElement = (TypeElement) element.getEnclosingElement();
+            final String rootNodeKey = typeElement.asType().toString();
+            final ElementNode childNode = callback.generateChildNode(element);
+            ElementNode elementRootNode = map.get(rootNodeKey);
+            if (elementRootNode == null) {
+                elementRootNode = new ElementNode(rootNodeKey, typeElement.getSimpleName().toString(), rootNodeKey, ElementUtils.getPackageName(mElementUtils, typeElement));
+                elementRootNode.setAnnotationMirrorList(typeElement.getAnnotationMirrors());
+                map.put(rootNodeKey, elementRootNode);
             }
-            if (elementMap != null) {
-                elementMap.put(elementKey, element);
-            } else {
-                elementMap = new HashMap<>();
-                elementMap.put(elementKey, element);
-                provideMap.put(elementMapKey, elementMap);
-            }
+            elementRootNode.addChild(childNode);
+        }
+        return map;
+    }
+
+
+    private void printMap(Map<String, ElementNode> map) {
+        final Set<String> rootNodeKeySet = map.keySet();
+        for (String key : rootNodeKeySet) {
+            mMessager.printMessage(Diagnostic.Kind.NOTE, "key = " + key + "--" + map.get(key).toString());
         }
     }
 
-    private void processInject(Set<? extends Element> elements, Map<TypeElement, Map<String, Element>> injectMap) {
-        for (Element element : elements) {
-            TypeElement typeElement = (TypeElement) element.getEnclosingElement();
-            Map<String, Element> elementMap = injectMap.get(typeElement);
-            Inject inject = element.getAnnotation(Inject.class);
-            String elementKey = inject.value();
-            if (elementKey.equals("")) {
-                elementKey = element.asType().toString();
-            }
-            if (elementMap != null) {
-                elementMap.put(elementKey, element);
-            } else {
-                elementMap = new HashMap<>();
-                elementMap.put(elementKey, element);
-                injectMap.put(typeElement, elementMap);
-            }
-        }
+
+    private interface Callback {
+        ElementNode generateChildNode(Element element);
     }
 }

@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 &emsp;&emsp;虽然我们的`Module`设置是从`Context01`里面获取注入源，但是`Context01`并没有id为`string1`的注入源，所以得从`deepProvides`为true的类里面去找，所以这里会在`Context02`里面找到。
+
 &emsp;&emsp;我们可以将`Context01`称为`父Context`，`Context02`称为`子Context`。
 #### &emsp;&emsp;注意点：
 >1. 理论上来说，不同Context里面可以存在相同id的注入源。但是需要注意的是，由于框架遍历Context树采用的是广搜算法，所以在搜索时，找到的第一个相匹配id的注入源就会停止搜索。为了保证结果的正确性，在同一个Context树里面，id最好是具有唯一性，当然如果你能保证匹配正确，可以使用多id。

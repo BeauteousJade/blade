@@ -101,9 +101,9 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 ```
-&emsp;&emsp;最后在调用`Injector`的`inject`方法。
+&emsp;&emsp;最后在调用`Blade`的`inject`方法。
 ```
-        Injector.inject(this, new Context());
+        Blade.inject(this, new Context());
 ```
 &emsp;&emsp;整个注入过程就完成了。
 # 4. 1.2.x新特性

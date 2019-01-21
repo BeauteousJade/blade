@@ -67,12 +67,15 @@ public class InjectProcessor extends AbstractProcessor {
 
     private Map<String, ElementNode> processProvide(Set<? extends Element> elements) {
 
-        final Map<String, ElementNode> provideMap = processAnnotation(elements, element -> {
-            final Provides provides = element.getAnnotation(Provides.class);
-            final String elementId = provides.value().equals("") ? element.asType().toString() : provides.value();
-            ElementNode childNode = new ElementNode(elementId, element.getSimpleName().toString(), element.asType().toString(), ElementUtils.getPackageName(mElementUtils, element));
-            childNode.addAnnotation(Provides.class, provides);
-            return childNode;
+        final Map<String, ElementNode> provideMap = processAnnotation(elements, new Callback() {
+            @Override
+            public ElementNode generateChildNode(Element element) {
+                final Provides provides = element.getAnnotation(Provides.class);
+                final String elementId = provides.value().equals("") ? element.asType().toString() : provides.value();
+                ElementNode childNode = new ElementNode(elementId, element.getSimpleName().toString(), element.asType().toString(), ElementUtils.getPackageName(mElementUtils, element));
+                childNode.addAnnotation(Provides.class, provides);
+                return childNode;
+            }
         });
         final Set<String> rooNodeKeySet = provideMap.keySet();
         for (String key : rooNodeKeySet) {
@@ -93,10 +96,13 @@ public class InjectProcessor extends AbstractProcessor {
     }
 
     private Map<String, ElementNode> processInject(Set<? extends Element> elements) {
-        return processAnnotation(elements, element -> {
-            final Inject inject = element.getAnnotation(Inject.class);
-            final String elementId = inject.value().equals("") ? element.asType().toString() : inject.value();
-            return new ElementNode(elementId, element.getSimpleName().toString(), element.asType().toString(), ElementUtils.getPackageName(mElementUtils, element));
+        return processAnnotation(elements, new Callback() {
+            @Override
+            public ElementNode generateChildNode(Element element) {
+                final Inject inject = element.getAnnotation(Inject.class);
+                final String elementId = inject.value().equals("") ? element.asType().toString() : inject.value();
+                return new ElementNode(elementId, element.getSimpleName().toString(), element.asType().toString(), ElementUtils.getPackageName(mElementUtils, element));
+            }
         });
     }
 

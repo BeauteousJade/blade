@@ -106,7 +106,48 @@ public class MainActivity extends AppCompatActivity {
         Injector.inject(this, new Context());
 ```
 &emsp;&emsp;整个注入过程就完成了。
-# 4. 参考框架
+# 4. 1.2.x新特性
+&emsp;&emsp;`Provides`注解新增一个`deepProvides`属性，默认为false。当`deepProvides`为true，表示当前注入的对象所在类的所注入对象可以作为当前注入对象所在Context的注入对象。形象的说，假设A类有一个里面B类对象被`Provides`注解标记，同时B类也是Context，如果`deepProvides`为true，B类的注入源可以通过A类找到，也就是，一个`Module`被标记在A类取得注入源，此时可以通过A类从B类中需要注入源。简而言之，就是深搜(广搜)思想。
+&emsp;&emsp;例如，`Context01`的代码：
+```
+public class Context01 {
+    @Provides(deepProvides = true)
+    public Context02 context02;
+    @Provides("string")
+    public String string;
+}
+```
+&emsp;&emsp;`Context01`内部有一个`Context02`对象，请注意我们将`deepProvides`为true。
+&emsp;&emsp;然后我们来看看`Context02`的代码：
+```
+public class Context02 {
+
+    @Provides("string1")
+    public String string;
+}
+```
+&emsp;&emsp;最后我们来看看注入部分：
+```
+@Module(Context01.class)
+public class MainActivity extends AppCompatActivity {
+
+    @Inject("string1")
+    String string;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+}
+```
+&emsp;&emsp;虽然我们的`Module`设置是从`Context01`里面获取注入源，但是`Context01`并没有id为`string1`的注入源，所以得从`deepProvides`为true的类里面去找，所以这里会在`Context02`里面找到。
+&emsp;&emsp;我们可以将`Context01`称为`父Context`，`Context02`称为`子Context`。
+#### &emsp;&emsp;注意点：
+>1. 理论上来说，不同Context里面可以存在相同id的注入源。但是需要注意的是，由于框架遍历Context树采用的是广搜算法，所以在搜索时，找到的第一个相匹配id的注入源就会停止搜索。为了保证结果的正确性，在同一个Context树里面，id最好是具有唯一性，当然如果你能保证匹配正确，可以使用多id。
+>2. 在构建Context树时，千万不要构成环路。也就是说，一个`子Context`将`父Context`作为自己的注入源。这种情况是必须避免的。
+
+# 5. 参考框架
 >1. [dagger](https://github.com/google/dagger)
 >2. [butterKnife](https://github.com/JakeWharton/butterknife)
 >3. [AptPreferences](https://github.com/joyrun/AptPreferences)

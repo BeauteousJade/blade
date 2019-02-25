@@ -10,8 +10,8 @@ public class Demo3 {
     String[] strings = new String[]{"string1", "string2"};
 
     @Provides
-    String[] string1;
+    String[] string1 = new String[]{"123"};
 
     @Provides(deepProvides = true)
-    Demo demo;
+    Demo demo = new Demo();
 }

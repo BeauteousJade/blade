@@ -8,6 +8,8 @@ import com.example.annation.Inject;
 import com.example.annation.Module;
 import com.example.inject.Blade;
 
+import java.util.Arrays;
+
 
 @Module(Context.class)
 public class MainActivity extends AppCompatActivity {
@@ -27,7 +29,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Blade.inject(this, new Context());
-        Log.i("pby123", "string1 = " + string1 + " string2 = " + strings);
+        Context context = new Context();
+        Blade.inject(this, context);
+        Log.i("pby123", "string1 = " + string1);
+        Log.i("pby123", " strings = " + Arrays.toString(strings));
+        Log.i("pby123", " strings1 = " + Arrays.toString(strings1));
     }
 }

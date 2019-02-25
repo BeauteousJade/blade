@@ -4,5 +4,5 @@ import com.example.annation.Provides;
 
 public class Demo {
     @Provides(deepProvides = true, value = "demoString")
-    Demo3 string3;
+    Demo3 string3 = new Demo3();
 }

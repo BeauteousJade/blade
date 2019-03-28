@@ -7,4 +7,6 @@ public final class Constants {
 
     public static final String INJECT_SUFFIX = "_Inject";
     public static final String INJECT_METHOD_NAME = "inject";
+
+    public static final String PROVIDER_SUFFIX = "ProviderImpl";
 }

@@ -4,7 +4,7 @@ import com.example.annation.Inject;
 import com.example.annation.Provides;
 import com.example.processor.node.ElementNode;
 import com.example.processor.util.ElementUtils;
-import com.example.processor.writer.JavaFileWriter;
+import com.example.processor.writer.JavaFileWriterV2;
 import com.google.auto.service.AutoService;
 
 import java.util.HashMap;
@@ -55,14 +55,13 @@ public class InjectProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
+        JavaFileWriterV2 fileWriterV2 = new JavaFileWriterV2(mFiler);
         // 处理@Provides
         Map<String, ElementNode> provideMap = processProvide(roundEnvironment.getElementsAnnotatedWith(Provides.class));
+        new JavaFileWriterV2(mFiler).writeProvider(provideMap);
         // 处理 @Inject
         Map<String, ElementNode> injectMap = processInject(roundEnvironment.getElementsAnnotatedWith(Inject.class));
-        // 生成Java文件
-        JavaFileWriter javaFileUtil = new JavaFileWriter(mFiler);
-        javaFileUtil.mMessager = mMessager;
-        javaFileUtil.writeJavaFile(provideMap, injectMap);
+        fileWriterV2.writerInject(injectMap);
         return true;
     }
 

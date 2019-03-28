@@ -3,6 +3,7 @@ package com.example.processor.node;
 import com.example.processor.util.StringUtils;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
 
 public class ElementNode {
 
@@ -157,6 +159,28 @@ public class ElementNode {
             }
         }
         return null;
+    }
+
+    public Map<String, String> getAllPath() {
+        Map<String, String> pathMap = new HashMap<>();
+        searchAllPath(this, "", "", pathMap);
+        return pathMap;
+    }
+
+    private void searchAllPath(ElementNode node, String path, String id, Map<String, String> pathMap) {
+        if (!StringUtils.isEmpty(path)) {
+            pathMap.put(id, path);
+        }
+        Map<String, ElementNode> nextMap = node.getNextMap();
+        if (nextMap == null || nextMap.size() == 0) {
+            return;
+        }
+        final String separation = StringUtils.isEmpty(path) ? "" : ".";
+        Set<String> keySet = nextMap.keySet();
+        for (String key : keySet) {
+            final ElementNode elementNode = nextMap.get(key);
+            searchAllPath(elementNode, path + separation + elementNode.getSimpleName(), elementNode.getId(), pathMap);
+        }
     }
 
     @Override

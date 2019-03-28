@@ -43,6 +43,7 @@ public class JavaFileWriterV2 {
                     .addStatement("pathMap = new $T<>()", HashMap.class);
             Map<String, String> pathMap = rootNode.getAllPath();
             MethodSpec.Builder initMethodBuilder = MethodSpec.methodBuilder("init")
+                    .addModifiers(Modifier.PUBLIC)
                     .addParameter(ParameterSpec.builder(ClassName.bestGuess(rootNode.getType()), "source").build());
             Set<String> pathKeySet = pathMap.keySet();
             for (String pathKey : pathKeySet) {
@@ -58,7 +59,8 @@ public class JavaFileWriterV2 {
             // put方法
             MethodSpec putMethod = MethodSpec.methodBuilder("put")
                     .addModifiers(Modifier.PUBLIC)
-                    .addParameter(ParameterSpec.builder(new ParameterizedTypeImpl(Map.class, new Class[]{String.class, String.class}), "map").build())
+                    .addAnnotation(AnnotationSpec.builder(Override.class).build())
+                    .addParameter(ParameterSpec.builder(new ParameterizedTypeImpl(Map.class, new Class[]{String.class, Object.class}), "map").build())
                     .addStatement("pathMap.putAll(map)")
                     .build();
 

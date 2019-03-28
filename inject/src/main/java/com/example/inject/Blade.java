@@ -11,10 +11,14 @@ public class Blade {
         inject(target, source, null);
     }
 
+    private static void inject(Object target, Map<String, ?> extraMap) {
+        inject(target, new EmptyProviderImpl(), extraMap);
+    }
+
     public static void inject(Object target, Object source, Map<String, ?> extraMap) {
         try {
-            final Object targetObject = Class.forName(target.getClass().getName() + "_Inject").newInstance();
-            final Provider sourceObject = (Provider) Class.forName(source.getClass().getName() + "ProviderImpl").newInstance();
+            Object targetObject = Class.forName(target.getClass().getName() + "_Inject").newInstance();
+            Provider sourceObject = (Provider) Class.forName(source.getClass().getName() + "ProviderImpl").newInstance();
             if (extraMap != null && !extraMap.isEmpty()) {
                 sourceObject.getClass().getMethod("put", Map.class).invoke(sourceObject, extraMap);
             }

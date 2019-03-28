@@ -115,7 +115,7 @@ public class InjectProcessor extends AbstractProcessor {
             final ElementNode childNode = callback.generateChildNode(element);
             ElementNode elementRootNode = map.get(rootNodeKey);
             if (elementRootNode == null) {
-                elementRootNode = new ElementNode(rootNodeKey, typeElement.getSimpleName().toString(), rootNodeKey, ElementUtils.getPackageName(mElementUtils, typeElement));
+                elementRootNode = new ElementNode(rootNodeKey, getRootNodeName(typeElement), rootNodeKey, ElementUtils.getPackageName(mElementUtils, typeElement));
                 elementRootNode.setAnnotationMirrorList(typeElement.getAnnotationMirrors());
                 map.put(rootNodeKey, elementRootNode);
             }
@@ -124,14 +124,23 @@ public class InjectProcessor extends AbstractProcessor {
         return map;
     }
 
-
-    private void printMap(Map<String, ElementNode> map) {
-        final Set<String> rootNodeKeySet = map.keySet();
-        for (String key : rootNodeKeySet) {
-            mMessager.printMessage(Diagnostic.Kind.NOTE, "key = " + key + "--" + map.get(key).toString());
+    /**
+     * 区别内部类和非内部类
+     * 如果是内部类，那么返回的是外部类名$内部类名
+     * 如果外部类，返回的是外部类名
+     *
+     * @return
+     */
+    private String getRootNodeName(TypeElement typeElement) {
+        final Element element = typeElement.getEnclosingElement();
+        if (!element.getKind().isClass() && !element.getKind().isInterface()) {
+            return typeElement.getSimpleName().toString();
+        } else {
+            String name = (typeElement).getQualifiedName().toString();
+            final int lastSecondIndex = name.lastIndexOf(".", name.lastIndexOf(".") - 1) + 1;
+            return name.substring(lastSecondIndex).replace(".", "$");
         }
     }
-
 
     private interface Callback {
         ElementNode generateChildNode(Element element);

@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.example.annation.Inject;
+import com.example.annation.Provides;
 import com.example.inject.Blade;
 
 import java.util.Arrays;
@@ -32,10 +33,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Context context = new Context();
         HashMap<String, Object> map = new HashMap<>();
-        map.put("pby", "pby123");
-        Blade.inject(this, context, map);
-        Log.i("pby123", "string1 = " + string1);
-        Log.i("pby123", " strings = " + Arrays.toString(strings));
-        Log.i("pby123", " strings1 = " + Arrays.toString(strings1));
+//        map.put("pby", "pby123");
+//        Blade.inject(this, context, map);
+//        Log.i("pby123", "string1 = " + string1);
+//        Log.i("pby123", " strings = " + Arrays.toString(strings));
+//        Log.i("pby123", " strings1 = " + Arrays.toString(strings1));
+    }
+
+    public static class Context {
+        @Provides("123")
+        String string;
     }
 }

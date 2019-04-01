@@ -88,6 +88,7 @@ public class JavaFileWriter {
             TypeSpec.Builder typeSpecBuilder = TypeSpec.classBuilder(rootNode.getSimpleName() + Constants.INJECT_SUFFIX).addModifiers(Modifier.PUBLIC);
             // inject方法
             MethodSpec.Builder injectMethodBuilder = MethodSpec.methodBuilder(Constants.INJECT_METHOD_NAME)
+                    .addModifiers(Modifier.PUBLIC)
                     .addParameter(ClassName.bestGuess(rootNode.getType()), Constants.TARGET)
                     .addParameter(Provider.class, Constants.SOURCE);
             for (String injectNodeKey : injectNodeKeySet) {

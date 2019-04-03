@@ -59,7 +59,7 @@ public class InjectProcessor extends AbstractProcessor {
         // 处理@Provides
         Map<String, ElementNode> provideMap = processProvide(roundEnvironment.getElementsAnnotatedWith(Provides.class));
         new JavaFileWriter(mFiler).writeProvider(provideMap);
-        // 处理 @Inject
+        // 处理@Inject
         Map<String, ElementNode> injectMap = processInject(roundEnvironment.getElementsAnnotatedWith(Inject.class));
         fileWriterV2.writerInject(injectMap);
         return true;
@@ -127,7 +127,7 @@ public class InjectProcessor extends AbstractProcessor {
     /**
      * 区别内部类和非内部类
      * 如果是内部类，那么返回的是外部类名$内部类名
-     * 如果外部类，返回的是外部类名
+     * 如果是外部类，返回的是外部类名
      *
      * @return
      */

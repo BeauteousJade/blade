@@ -135,3 +135,6 @@ public class MainActivity extends AppCompatActivity {
 >1. [dagger](https://github.com/google/dagger)
 >2. [butterKnife](https://github.com/JakeWharton/butterknife)
 >3. [AptPreferences](https://github.com/joyrun/AptPreferences)
+# 7. blog
+>1. [Blade - 基本使用](https://www.jianshu.com/p/32ca48a6e05e)
+>2. [Blade - 1.4版本重大更新](https://www.jianshu.com/p/65002b459042)

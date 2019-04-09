@@ -40,14 +40,16 @@ public class JavaFileWriter {
             // 构造方法
             MethodSpec.Builder constructorMethod = MethodSpec.constructorBuilder()
                     .addModifiers(Modifier.PUBLIC)
-                    .addStatement("pathMap = new $T<>()", HashMap.class);
+                    .addParameter(ParameterSpec.builder(ClassName.bestGuess(rootNode.getType()), "source").build())
+                    .addParameter(ParameterSpec.builder(new ParameterizedTypeImpl(Map.class, new Class[]{String.class, Object.class}), "map").build())
+                    .addStatement("pathMap = new $T<>()", HashMap.class)
+                    .addCode("if (map != null && !map.isEmpty()) {\n")
+                    .addCode("\tpathMap.putAll(map);\n")
+                    .addCode("}\n");
             Map<String, String> pathMap = rootNode.getAllPath();
-            MethodSpec.Builder initMethodBuilder = MethodSpec.methodBuilder("init")
-                    .addModifiers(Modifier.PUBLIC)
-                    .addParameter(ParameterSpec.builder(ClassName.bestGuess(rootNode.getType()), "source").build());
             Set<String> pathKeySet = pathMap.keySet();
             for (String pathKey : pathKeySet) {
-                initMethodBuilder.addStatement("pathMap.put($S, source.$L);", pathKey, pathMap.get(pathKey));
+                constructorMethod.addStatement("pathMap.put($S, source.$L)", pathKey, pathMap.get(pathKey));
             }
             // find方法
             MethodSpec findMethod = MethodSpec.methodBuilder("find")
@@ -56,19 +58,10 @@ public class JavaFileWriter {
                     .addAnnotation(AnnotationSpec.builder(Override.class).build())
                     .addParameter(ParameterSpec.builder(String.class, "id").build())
                     .addStatement("return pathMap.get(id)").build();
-            // put方法
-            MethodSpec putMethod = MethodSpec.methodBuilder("put")
-                    .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(AnnotationSpec.builder(Override.class).build())
-                    .addParameter(ParameterSpec.builder(new ParameterizedTypeImpl(Map.class, new Class[]{String.class, Object.class}), "map").build())
-                    .addStatement("pathMap.putAll(map)")
-                    .build();
 
             TypeSpec typeSpec = typeSpecBuilder
                     .addMethod(constructorMethod.build())
                     .addMethod(findMethod)
-                    .addMethod(putMethod)
-                    .addMethod(initMethodBuilder.build())
                     .build();
             JavaFile javaFile = JavaFile.builder(rootNode.getPackageName(), typeSpec).build();
             try {

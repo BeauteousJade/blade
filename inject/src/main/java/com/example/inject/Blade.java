@@ -18,12 +18,12 @@ public class Blade {
     public static void inject(Object target, Object source, Map<String, ?> extraMap) {
         try {
             Object targetObject = Class.forName(target.getClass().getName() + "_Inject").newInstance();
-            Provider sourceObject = (Provider) Class.forName(source.getClass().getName() + "ProviderImpl").newInstance();
-            if (extraMap != null && !extraMap.isEmpty()) {
-                sourceObject.getClass().getMethod("put", Map.class).invoke(sourceObject, extraMap);
-            }
-            sourceObject.getClass().getMethod("init", source.getClass()).invoke(sourceObject, source);
-            targetObject.getClass().getMethod("inject", target.getClass(), Provider.class).invoke(targetObject, target, sourceObject);
+            Provider sourceObject = (Provider) Class.forName(source.getClass().getName() + "ProviderImpl")
+                    .getConstructor(source.getClass(), Map.class)
+                    .newInstance(source, extraMap);
+            targetObject.getClass()
+                    .getMethod("inject", target.getClass(), Provider.class)
+                    .invoke(targetObject, target, sourceObject);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

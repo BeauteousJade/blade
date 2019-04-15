@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.annation.Inject;
-import com.example.annation.Provides;
 import com.example.inject.Blade;
 
 import java.util.HashMap;
@@ -36,10 +35,5 @@ public class MainActivity extends AppCompatActivity {
 //        Log.i("pby123", "string1 = " + string1);
 //        Log.i("pby123", " strings = " + Arrays.toString(strings));
 //        Log.i("pby123", " strings1 = " + Arrays.toString(strings1));
-    }
-
-    public static class Context {
-        @Provides("123")
-        String string;
     }
 }

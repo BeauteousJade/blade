@@ -9,7 +9,8 @@
 &emsp;&emsp;当然我也不是吃饱了撑的没事干(其实仔细想一想，还是有那么一点)，这里面是有一定的原因。最近，楼主做自己的毕业设计，想在自己的毕业设计中加上依赖注入的框架，使得写的代码更加简洁。介于这个原因，我去学习了Google爸爸的`Dagger`框架。在学习过程中，我发现`Dagger`的一个设计，就是它提供对象都是通过方法来实现的，这个与我的想法有点相悖(有可能还有其他方式可以实现，但是我不知道)。由于这个原因，我就狠下心，打算自己来写一个，自己想要什么都可以自己来实现，然后入坑了。。。
 
 &emsp;&emsp;在这框架开发过程中，我借鉴了`Dagger`的部分思想。其实，我们可以从框架命名可以看出来，`Dagger`的中文意思是`匕首`，而`Blade`是剑的意思，看上去也是非常相似，以表示我对`Dagger`的尊重。
-&emsp;&emsp;接下来，我将简单介绍一下`Blade`（其实就是将github的ReadMe拷贝过来）。
+
+&emsp;&emsp;接下来，我将简单介绍一下`Blade`。
 # 2. gradle 导入方式
 ### (1). 项目的build.gradle
 ```
@@ -30,7 +31,7 @@ dependencies {
 ```
 
 # 3. 基本结构
-&emsp;&emsp;在整个DI框架，有两个个注解，分别是`Inject`, `Provides`，先来解释这三个注解所表示的意思。
+&emsp;&emsp;在整个DI框架，有两个注解，分别是`Inject`, `Provides`，先来解释这三个注解所表示的意思。
 
 |注解|含义|使用范围|
 |---|---|---|
@@ -52,12 +53,12 @@ public class Blade {
     public static void inject(Object target, Object source, Map<String, ?> extraMap) {
         try {
             Object targetObject = Class.forName(target.getClass().getName() + "_Inject").newInstance();
-            Provider sourceObject = (Provider) Class.forName(source.getClass().getName() + "ProviderImpl").newInstance();
-            if (extraMap != null && !extraMap.isEmpty()) {
-                sourceObject.getClass().getMethod("put", Map.class).invoke(sourceObject, extraMap);
-            }
-            sourceObject.getClass().getMethod("init", source.getClass()).invoke(sourceObject, source);
-            targetObject.getClass().getMethod("inject", target.getClass(), Provider.class).invoke(targetObject, target, sourceObject);
+            Provider sourceObject = (Provider) Class.forName(source.getClass().getName() + "ProviderImpl")
+                    .getConstructor(source.getClass(), Map.class)
+                    .newInstance(source, extraMap);
+            targetObject.getClass()
+                    .getMethod("inject", target.getClass(), Provider.class)
+                    .invoke(targetObject, target, sourceObject);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -90,7 +91,6 @@ public class MainActivity_Inject {
 # 4. 基本使用
 &emsp;&emsp;首先我们有一个类的有一些变量注入，比如`MainActivity`
 ```
-@Module(MainActivity.Context.class)
 public class MainActivity extends AppCompatActivity {
 
     @Inject
@@ -108,7 +108,8 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 &emsp;&emsp;这里需要注意的是：
->1. 注入的变量需要标记`Inject`
+>1. 注入的变量需要标记`Inject`。
+>2. 如果注入源带有Id，inject必须带有id。
 
 &emsp;&emsp;然后我们定义一个Context对象：
 ```
@@ -124,7 +125,8 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 &emsp;&emsp;这里需要注意的是：
->1. 作为数据源的变量需要标记`Provides `
+>1. 作为数据源的变量需要标记`Provides `。
+>2. 建议`Provides `带id，保证唯一性。如果不带id，在同一个`Context`树中，同类型的数据源有且只能有一个。
 
 &emsp;&emsp;最后在调用`Blade`的`inject`方法。
 ```
@@ -140,3 +142,4 @@ public class MainActivity extends AppCompatActivity {
 # 7. blog
 >1. [Blade - 基本使用](https://www.jianshu.com/p/32ca48a6e05e)
 >2. [Blade - 1.4版本重大更新](https://www.jianshu.com/p/65002b459042)
+

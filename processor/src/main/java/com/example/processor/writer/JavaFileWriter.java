@@ -101,6 +101,11 @@ public class JavaFileWriter {
     }
 
     private CodeBlock generateCodeBlock(ElementNode injectNode) {
-        return CodeBlock.builder().add("$L.$L = ($L)($L.find($S))", Constants.TARGET, injectNode.getSimpleName(), injectNode.getType(), Constants.SOURCE, injectNode.getId()).build();
+        if (!injectNode.isPrimitive()) {
+            return CodeBlock.builder().add("$L.$L = ($L)($L.find($S))", Constants.TARGET, injectNode.getSimpleName(), injectNode.getType(), Constants.SOURCE, injectNode.getId()).build();
+        }
+        return CodeBlock.builder().add("$L.$L = $L.find($S) == null? 0 : ($L)($L.find($S))", Constants.TARGET,
+                injectNode.getSimpleName(), Constants.SOURCE, injectNode.getId(), injectNode.getType(),
+                Constants.SOURCE, injectNode.getId()).build();
     }
 }

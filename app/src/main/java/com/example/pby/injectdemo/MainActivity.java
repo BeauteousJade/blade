@@ -32,8 +32,5 @@ public class MainActivity extends AppCompatActivity {
         HashMap<String, Object> map = new HashMap<>();
         map.put("pby", "pby123");
         Blade.inject(this, context, map);
-//        Log.i("pby123", "string1 = " + string1);
-//        Log.i("pby123", " strings = " + Arrays.toString(strings));
-//        Log.i("pby123", " strings1 = " + Arrays.toString(strings1));
     }
 }

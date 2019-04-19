@@ -72,7 +72,8 @@ public class InjectProcessor extends AbstractProcessor {
             public ElementNode generateChildNode(Element element) {
                 final Provides provides = element.getAnnotation(Provides.class);
                 final String elementId = provides.value().equals("") ? element.asType().toString() : provides.value();
-                ElementNode childNode = new ElementNode(elementId, element.getSimpleName().toString(), element.asType().toString(), ElementUtils.getPackageName(mElementUtils, element));
+                ElementNode childNode = new ElementNode(elementId, element.getSimpleName().toString(),
+                        element.asType().toString(), ElementUtils.getPackageName(mElementUtils, element), element.asType().getKind().isPrimitive());
                 childNode.addAnnotation(Provides.class, provides);
                 return childNode;
             }
@@ -101,7 +102,8 @@ public class InjectProcessor extends AbstractProcessor {
             public ElementNode generateChildNode(Element element) {
                 final Inject inject = element.getAnnotation(Inject.class);
                 final String elementId = inject.value().equals("") ? element.asType().toString() : inject.value();
-                return new ElementNode(elementId, element.getSimpleName().toString(), element.asType().toString(), ElementUtils.getPackageName(mElementUtils, element));
+                return new ElementNode(elementId, element.getSimpleName().toString(),
+                        element.asType().toString(), ElementUtils.getPackageName(mElementUtils, element), element.asType().getKind().isPrimitive());
             }
         });
     }
@@ -115,8 +117,8 @@ public class InjectProcessor extends AbstractProcessor {
             final ElementNode childNode = callback.generateChildNode(element);
             ElementNode elementRootNode = map.get(rootNodeKey);
             if (elementRootNode == null) {
-                elementRootNode = new ElementNode(rootNodeKey, getRootNodeName(typeElement), rootNodeKey, ElementUtils.getPackageName(mElementUtils, typeElement));
-                elementRootNode.setAnnotationMirrorList(typeElement.getAnnotationMirrors());
+                elementRootNode = new ElementNode(rootNodeKey, getRootNodeName(typeElement),
+                        rootNodeKey, ElementUtils.getPackageName(mElementUtils, typeElement), element.asType().getKind().isPrimitive());
                 map.put(rootNodeKey, elementRootNode);
             }
             elementRootNode.addChild(childNode);

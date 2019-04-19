@@ -3,32 +3,31 @@ package com.example.processor.node;
 import com.example.processor.util.StringUtils;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
 
 public class ElementNode {
 
     private String id;
     private String simpleName;
     private String type;
+    private boolean isPrimitive;
     private String packageName;
-    // 当前Element的annotationMirror集合，只有被Inject注解标记的根节点不为空，其他情况下均为空
-    private List<? extends AnnotationMirror> annotationMirrorList;
     private Map<Class<? extends Annotation>, Annotation> annotationMap;
     private Map<String, ElementNode> nextMap;
 
-    public ElementNode(String id, String simpleName, String type, String packageName) {
+    public ElementNode(String id, String simpleName, String type, String packageName, boolean isPrimitive) {
         this.id = id;
         this.simpleName = simpleName;
         this.type = type;
         this.packageName = packageName;
+        this.isPrimitive = isPrimitive;
+    }
+
+    public boolean isPrimitive() {
+        return isPrimitive;
     }
 
     public String getPackageName() {
@@ -70,15 +69,6 @@ public class ElementNode {
     public Map<String, ElementNode> getNextMap() {
         return nextMap;
     }
-
-    public List<? extends AnnotationMirror> getAnnotationMirrorList() {
-        return annotationMirrorList;
-    }
-
-    public void setAnnotationMirrorList(List<? extends AnnotationMirror> annotationMirrorList) {
-        this.annotationMirrorList = annotationMirrorList;
-    }
-
     public void setAnnotationMap(Map<Class<? extends Annotation>, Annotation> annotationMap) {
         this.annotationMap = annotationMap;
     }

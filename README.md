@@ -38,56 +38,7 @@ dependencies {
 |Inject|如果一个变量需要注入，那么该变量会被标记`Inject`，表示注入的目标|比如上面的B类对象，必须标记`Inject`。该注解默认带一个String参数(可以不填)， 表示以此String字符串为id从注入源取得注入对象;不填表示默认以该对象的`ClassName`为id。因此，在同一个Module下，不能同时有两个相同类型的变量的`Inject`注解不填id。|
 |Provides|如果一个变量需要被注入，该变量会标记`Provides`注解。需要被注入的变量必须放在一个Context（Object类型，也就是任意类型）里面；反之，如果一个类里面有一个变量标记了`Provides`注解，表示该类可以作为一个Context|`Provides`默认带一个String参数，表示注入的id，跟`Inject`的参数相对应。|
 
-&emsp;&emsp;如果使用注解成功的标记我们想要被注入和注入的变量，我们可以在通过调用`Blade`的`inject(Object target, Object source)`方法进行注入操作的最后一步，也只有经过这一步，想要注入的变量才会成功赋值。如下是`Blade`的代码：
-```
-public class Blade {
-
-    public static void inject(Object target, Object source) {
-        inject(target, source, null);
-    }
-
-    private static void inject(Object target, Map<String, ?> extraMap) {
-        inject(target, new EmptyProviderImpl(), extraMap);
-    }
-
-    public static void inject(Object target, Object source, Map<String, ?> extraMap) {
-        try {
-            Object targetObject = Class.forName(target.getClass().getName() + "_Inject").newInstance();
-            Provider sourceObject = (Provider) Class.forName(source.getClass().getName() + "ProviderImpl")
-                    .getConstructor(source.getClass(), Map.class)
-                    .newInstance(source, extraMap);
-            targetObject.getClass()
-                    .getMethod("inject", target.getClass(), Provider.class)
-                    .invoke(targetObject, target, sourceObject);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-}
-```
-&emsp;&emsp;这也是本框架唯一通过反射方式来实现的地方。
-
-&emsp;&emsp;在编译器时期，APT会扫面每个被`Module`标记的类，然后对应着会生成一个Java类，上面代码的作用就是调用生成的Java类的`inject`方法进行赋值。下面是一个Demo代码：
-```
-public class MainActivity_Inject {
-  public void inject(MainActivity target, Provider source) {
-    target.strings = (java.lang.String[])(source.find("strings"));
-    target.demoDemoString = (java.lang.String)(source.find("demoDemoString"));
-    target.pby = (java.lang.String)(source.find("pby"));
-    target.string1 = (java.lang.String)(source.find("demo3String"));
-    target.strings1 = (java.lang.String[])(source.find("java.lang.String[]"));
-    target.code = (int)(source.find("int"));
-  }
-}
-```
+&emsp;&emsp;如果使用注解成功的标记我们想要被注入和注入的变量，我们可以在通过调用`Blade`的`inject(Object target, Object source)`方法进行注入操作的最后一步，也只有经过这一步，想要注入的变量才会成功赋值。
 # 4. 基本使用
 &emsp;&emsp;首先我们有一个类的有一些变量注入，比如`MainActivity`
 ```

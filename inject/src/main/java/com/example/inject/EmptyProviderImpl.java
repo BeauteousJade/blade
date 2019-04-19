@@ -2,9 +2,22 @@ package com.example.inject;
 
 import com.example.annation.inter.Provider;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class EmptyProviderImpl implements Provider {
+
+    private Map<String, Object> pathMap;
+
+    public EmptyProviderImpl(Map<String, ?> extraMap) {
+        pathMap = new HashMap<>();
+        if (extraMap != null && !extraMap.isEmpty()) {
+            pathMap.putAll(extraMap);
+        }
+    }
+
     @Override
     public Object find(String key) {
-        return null;
+        return pathMap.get(key);
     }
 }

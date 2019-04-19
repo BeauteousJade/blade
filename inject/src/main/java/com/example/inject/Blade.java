@@ -7,18 +7,18 @@ import java.util.Map;
 
 public class Blade {
 
-    public static void inject(Object target, Object source) {
-        inject(target, source, null);
+    public static void inject(Object target, Map<String, ?> extraMap) {
+        inject(target, new EmptyProviderImpl(extraMap), extraMap);
     }
 
-    private static void inject(Object target, Map<String, ?> extraMap) {
-        inject(target, new EmptyProviderImpl(), extraMap);
+    public static void inject(Object target, Object source) {
+        inject(target, source, null);
     }
 
     public static void inject(Object target, Object source, Map<String, ?> extraMap) {
         try {
             Object targetObject = Class.forName(target.getClass().getName() + "_Inject").newInstance();
-            Provider sourceObject = (Provider) Class.forName(source.getClass().getName() + "ProviderImpl")
+            Provider sourceObject = source instanceof Provider ? (Provider) source : (Provider) Class.forName(source.getClass().getName() + "ProviderImpl")
                     .getConstructor(source.getClass(), Map.class)
                     .newInstance(source, extraMap);
             targetObject.getClass()

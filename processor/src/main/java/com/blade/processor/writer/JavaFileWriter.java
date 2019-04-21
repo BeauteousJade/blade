@@ -104,7 +104,12 @@ public class JavaFileWriter {
         if (!injectNode.isPrimitive()) {
             return CodeBlock.builder().add("$L.$L = ($L)($L.find($S))", Constants.TARGET, injectNode.getSimpleName(), injectNode.getType(), Constants.SOURCE, injectNode.getId()).build();
         }
-        return CodeBlock.builder().add("$L.$L = $L.find($S) == null? 0 : ($L)($L.find($S))", Constants.TARGET,
+        if (injectNode.getType().toLowerCase().contains("boolean")) {
+            return CodeBlock.builder().add("$L.$L = $L.find($S) == null ? false : ($L)($L.find($S))", Constants.TARGET,
+                    injectNode.getSimpleName(), Constants.SOURCE, injectNode.getId(), injectNode.getType(),
+                    Constants.SOURCE, injectNode.getId()).build();
+        }
+        return CodeBlock.builder().add("$L.$L = $L.find($S) == null ? 0 : ($L)($L.find($S))", Constants.TARGET,
                 injectNode.getSimpleName(), Constants.SOURCE, injectNode.getId(), injectNode.getType(),
                 Constants.SOURCE, injectNode.getId()).build();
     }

@@ -1,4 +1,4 @@
-package com.example.annation.inter;
+package com.example.annotation.inter;
 
 public interface Provider {
     Object find(String key);

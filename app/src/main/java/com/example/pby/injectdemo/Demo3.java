@@ -1,6 +1,6 @@
 package com.example.pby.injectdemo;
 
-import com.example.annation.Provides;
+import com.example.annotation.Provides;
 import com.example.pby.injectdemo.demo.Demo;
 
 public class Demo3 {

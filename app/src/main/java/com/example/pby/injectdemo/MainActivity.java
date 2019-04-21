@@ -3,7 +3,7 @@ package com.example.pby.injectdemo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.example.annation.Inject;
+import com.example.annotation.Inject;
 import com.example.inject.Blade;
 
 import java.util.HashMap;

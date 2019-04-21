@@ -1,6 +1,6 @@
 package com.example.pby.injectdemo;
 
-import com.example.annation.Provides;
+import com.example.annotation.Provides;
 
 public class Context {
     @Provides(deepProvides = true, value = "contextString1")

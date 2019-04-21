@@ -1,11 +1,14 @@
 package com.example.inject;
 
-import com.example.annation.inter.Provider;
+import com.example.annotation.inter.Provider;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Blade {
+
+    private static final Map<String, Object> OBJECT_MAP = new HashMap<>();
 
     public static void inject(Object target, Map<String, ?> extraMap) {
         inject(target, new EmptyProviderImpl(extraMap), extraMap);
@@ -17,10 +20,20 @@ public class Blade {
 
     public static void inject(Object target, Object source, Map<String, ?> extraMap) {
         try {
-            Object targetObject = Class.forName(target.getClass().getName() + "_Inject").newInstance();
-            Provider sourceObject = source instanceof Provider ? (Provider) source : (Provider) Class.forName(source.getClass().getName() + "ProviderImpl")
-                    .getConstructor(source.getClass(), Map.class)
-                    .newInstance(source, extraMap);
+            final String targetClassName = target.getClass().getName() + "_Inject";
+            final String sourceClassName = source.getClass().getName();
+            Object targetObject = OBJECT_MAP.get(targetClassName);
+            if (targetObject == null) {
+                targetObject = Class.forName(targetClassName).newInstance();
+                OBJECT_MAP.put(targetClassName, targetObject);
+            }
+            Provider sourceObject = (Provider) OBJECT_MAP.get(sourceClassName);
+            if (sourceObject == null) {
+                sourceObject = source instanceof Provider ? (Provider) source : (Provider) Class.forName(sourceClassName + "ProviderImpl")
+                        .getConstructor(source.getClass(), Map.class)
+                        .newInstance(source, extraMap);
+                OBJECT_MAP.put(sourceClassName, sourceObject);
+            }
             targetObject.getClass()
                     .getMethod("inject", target.getClass(), Provider.class)
                     .invoke(targetObject, target, sourceObject);

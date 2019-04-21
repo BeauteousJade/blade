@@ -1,4 +1,4 @@
-import com.example.annation.Provides;
+import com.example.annotation.Provides;
 
 public class ContextDemo {
     @Provides("contextDemo")

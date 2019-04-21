@@ -1,4 +1,4 @@
-package com.example.annation;
+package com.example.annotation;
 
 public @interface Inject {
     String value() default "";

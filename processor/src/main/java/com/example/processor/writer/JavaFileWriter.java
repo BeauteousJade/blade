@@ -1,6 +1,6 @@
 package com.example.processor.writer;
 
-import com.example.annation.inter.Provider;
+import com.example.annotation.inter.Provider;
 import com.example.processor.Constants;
 import com.example.processor.ParameterizedTypeImpl;
 import com.example.processor.node.ElementNode;

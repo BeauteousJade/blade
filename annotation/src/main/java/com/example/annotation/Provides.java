@@ -1,4 +1,4 @@
-package com.example.annation;
+package com.example.annotation;
 
 
 import java.lang.annotation.ElementType;

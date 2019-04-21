@@ -1,6 +1,6 @@
 package com.example.inject;
 
-import com.example.annation.inter.Provider;
+import com.example.annotation.inter.Provider;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -7,3 +7,6 @@ dependencies {
     implementation 'com.squareup:javapoet:1.10.0'
     compile project(':annotation')
 }
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}

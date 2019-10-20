@@ -17,7 +17,7 @@ public final class FetcherHolder {
         for (Object source : sources) {
             if (source instanceof Map && ((Map) source).containsKey(name)) {
                 return (T) ((Map) source).get(name);
-            } else {
+            } else if (!(source instanceof Map)) {
                 Fetcher fetcher = getFetcher(source.getClass());
                 if (fetcher != null) {
                     fetcher.init(source);

@@ -32,3 +32,15 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     api project(':annotation')
 }
+task clearJar(type: Delete) {
+    delete 'build/intermediates/packaged-classes/release/blade.jar'////这行表示如果你已经打过一次包了，再进行打包则把原来的包删掉
+}
+
+task makeJar(type: Copy) {
+    from('build/intermediates/packaged-classes/release/') //这行表示要打包的文件的路径，根据下面的内容，其实是该路径下的classes.jar
+    into('build/intermediates/packaged-classes/release/')  //这行表示打包完毕后包的生成路径，也就是生成的包存在哪
+    include('classes.jar')  //看到这行，如果你对分包有了解的话，你就可以看出来这行它只是将一些类打包了
+    rename ('classes.jar', 'blade.jar')
+}
+
+makeJar.dependsOn(clearJar, build)

@@ -8,7 +8,7 @@ import java.util.Map;
 public class Blade {
 
     public static <T> void inject(T target, Map<String, Object> extraMap) {
-        inject(target, extraMap);
+        inject(target, null, extraMap);
     }
 
     public static <T> void inject(T target, Object source) {
@@ -17,6 +17,8 @@ public class Blade {
 
     public static <T> void inject(T target, Object source, Map<String, Object> extraMap) {
         Injector<T> injector = TargetInjectors.injector(target);
-        injector.inject(target, source, extraMap);
+        if (injector != null) {
+            injector.inject(target, source, extraMap);
+        }
     }
 }

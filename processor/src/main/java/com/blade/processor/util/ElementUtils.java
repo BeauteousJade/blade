@@ -1,6 +1,8 @@
 package com.blade.processor.util;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 
 public class ElementUtils {
@@ -27,5 +29,11 @@ public class ElementUtils {
             // 没有包名
             return "";
         }
+    }
+
+    public static boolean isInnerClass(TypeElement typeElement) {
+        Element enclosingElement = typeElement.getEnclosingElement();
+        ElementKind kind = enclosingElement.getKind();
+        return kind.isClass() || kind.isInterface();
     }
 }

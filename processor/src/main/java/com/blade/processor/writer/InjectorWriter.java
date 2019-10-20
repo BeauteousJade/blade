@@ -57,10 +57,11 @@ public class InjectorWriter implements Writer {
      * @return
      */
     private TypeSpec.Builder generateTypeSpecBuilder(ClassEntry classEntry) {
-        TypeSpec.Builder builder = TypeSpec.classBuilder(classEntry.getSimpleName() + "Injector");
+        TypeSpec.Builder builder = TypeSpec.classBuilder((classEntry.isInnerClass() ?
+                classEntry.getInnerClassName().replace(".", "$") : classEntry.getSimpleName()) + "Injector");
         // 实现Injector接口
         TypeName superInterface = ParameterizedTypeName.get(getInjectorInterface(),
-                ClassName.get(classEntry.getPackageName(), classEntry.getSimpleName()));
+                ClassName.bestGuess(classEntry.getClassName()));
         builder.addSuperinterface(superInterface);
         builder.addModifiers(Modifier.FINAL, Modifier.PUBLIC);
         return builder;

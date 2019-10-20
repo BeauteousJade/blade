@@ -70,10 +70,12 @@ public class FetcherWriter implements Writer {
      * @return
      */
     private TypeSpec.Builder generateTypeSpecBuilder(ClassEntry classEntry) {
-        TypeSpec.Builder builder = TypeSpec.classBuilder(classEntry.getSimpleName() + "Fetcher");
+        TypeSpec.Builder builder = TypeSpec.classBuilder((classEntry.isInnerClass() ?
+                classEntry.getInnerClassName().replace(".", "$") : classEntry.getSimpleName()) + "Fetcher");
         // 实现Fetcher接口
         TypeName superInterface = ParameterizedTypeName.get(getFetcherInterface(),
-                ClassName.get(classEntry.getPackageName(), classEntry.getSimpleName()));
+                ClassName.get(classEntry.getPackageName(), classEntry.isInnerClass() ?
+                        classEntry.getInnerClassName() : classEntry.getSimpleName()));
         builder.addSuperinterface(superInterface);
         builder.addModifiers(Modifier.FINAL, Modifier.PUBLIC);
         return builder;
@@ -110,9 +112,8 @@ public class FetcherWriter implements Writer {
         }
         // 添加superFetcher
         FieldSpec.Builder superFetcherFieldSpecBuilder =
-                FieldSpec.builder(getFetcher(ClassName.get(classEntry.getPackageName(),
-                        classEntry.getSimpleName())), SUPER_FETCH_FIELD_NAME, Modifier.PRIVATE)
-                        .addAnnotation(ClassUtils.getNullable());
+                FieldSpec.builder(getFetcher(ClassName.bestGuess(classEntry.getClassName())), SUPER_FETCH_FIELD_NAME,
+                        Modifier.PRIVATE).addAnnotation(ClassUtils.getNullable());
         typeSpecBuilder.addField(superFetcherFieldSpecBuilder.build());
     }
 
@@ -128,8 +129,8 @@ public class FetcherWriter implements Writer {
         MethodSpec.Builder constructorMethodSpecBuilder =
                 MethodUtils.buildConstructorMethod(Modifier.PUBLIC);
         constructorMethodSpecBuilder.addStatement("$L =  ($L<$L>)$T.fetcher($L.class.getSuperclass())",
-                SUPER_FETCH_FIELD_NAME, Constant.FETCHER_CLASS_NAME, classEntry.getSimpleName(), getSourceFetchers(),
-                classEntry.getSimpleName());
+                SUPER_FETCH_FIELD_NAME, Constant.FETCHER_CLASS_NAME, getInnerClassName(classEntry), getSourceFetchers(),
+                getInnerClassName(classEntry));
         typeSpecBuilder.addMethod(constructorMethodSpecBuilder.build());
     }
 
@@ -143,7 +144,8 @@ public class FetcherWriter implements Writer {
                                     ClassEntry classEntry) {
         String parameterName = classNameToParameterName(classEntry.getSimpleName());
         ParameterSpec.Builder parameterSpecBuilder =
-                ParameterSpec.builder(ClassName.bestGuess(classEntry.getClassName()), parameterName);
+                ParameterSpec.builder(ClassName.bestGuess(classEntry.getClassName()),
+                        parameterName);
         MethodSpec.Builder initMethodBuilder = MethodUtils.buildOverrideMethod(INIT_METHOD_NAME,
                 Modifier.PUBLIC, void.class, parameterSpecBuilder.build());
         initMethodBuilder.addCode("if ($L != null) {\n", SUPER_FETCH_FIELD_NAME);
@@ -166,7 +168,8 @@ public class FetcherWriter implements Writer {
     private void generateFetchMethod(TypeSpec.Builder typeSpecBuilder,
                                      ClassEntry classEntry) {
         String parameterName = "name";
-        ParameterSpec.Builder parameterSpecBuilder = ParameterSpec.builder(String.class, parameterName);
+        ParameterSpec.Builder parameterSpecBuilder = ParameterSpec.builder(String.class,
+                parameterName);
         MethodSpec.Builder fetchMethodBuilder = MethodSpec.methodBuilder(FETCH_METHOD_NAME)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(AnnotationSpec.builder(Override.class).build())
@@ -187,5 +190,10 @@ public class FetcherWriter implements Writer {
         fetchMethodBuilder.addCode("}");
         fetchMethodBuilder.addStatement("return null");
         typeSpecBuilder.addMethod(fetchMethodBuilder.build());
+    }
+
+    private String getInnerClassName(ClassEntry classEntry) {
+        return classEntry.isInnerClass() ?
+                classEntry.getInnerClassName() : classEntry.getSimpleName();
     }
 }

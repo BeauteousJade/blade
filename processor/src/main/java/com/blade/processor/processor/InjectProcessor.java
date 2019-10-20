@@ -49,7 +49,7 @@ public class InjectProcessor extends BaseProcessor {
         Map<String, ClassEntry> classEntryMap = new HashMap<>();
         List<ClassEntry> classEntryList = new ArrayList<>();
         for (Element element : fieldElements) {
-            TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
+            TypeElement typeElement = (TypeElement) element.getEnclosingElement();
             FieldEntry fieldEntry = new FieldEntry();
             fieldEntry.setFieldName(element.getSimpleName().toString());
             TypeMirror type = element.asType();
@@ -59,14 +59,18 @@ public class InjectProcessor extends BaseProcessor {
             fieldEntry.setSupportNull(containsNullableAnnotation(element));
             fieldEntry.setPrimitive(type.getKind().isPrimitive());
             fieldEntry.setTypeName(ElementUtils.getSimpleType(type.toString()));
-            String className = enclosingElement.getQualifiedName().toString();
+            String className = typeElement.getQualifiedName().toString();
             if (classEntryMap.containsKey(className)) {
                 ClassEntry classEntry = classEntryMap.get(className);
                 classEntry.getFieldEntryList().add(fieldEntry);
             } else {
                 ClassEntry classEntry = new ClassEntry();
-                classEntry.setPackageName(ElementUtils.getPackageName(mElementUtils, enclosingElement));
-                classEntry.setSimpleName(enclosingElement.getSimpleName().toString());
+                classEntry.setPackageName(ElementUtils.getPackageName(mElementUtils, typeElement));
+                classEntry.setSimpleName(typeElement.getSimpleName().toString());
+                classEntry.setInnerClass(ElementUtils.isInnerClass(typeElement));
+                if (ElementUtils.isInnerClass(typeElement)) {
+                    classEntry.setInnerClassName(typeElement.getEnclosingElement().getSimpleName().toString() + "." + typeElement.getSimpleName().toString());
+                }
                 classEntry.setClassName(className);
                 classEntry.setFieldEntryList(new ArrayList<>());
                 classEntry.getFieldEntryList().add(fieldEntry);

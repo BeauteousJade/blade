@@ -2,16 +2,24 @@ package com.blade.processor.util;
 
 public class StringUtils {
 
-    private static final String EMPTY_STRING = "";
-
-    public static String emptyIfNull(String id) {
-        if (id != null) {
-            return id;
-        }
-        return EMPTY_STRING;
+    public static boolean isEmpty(String string) {
+        return string == null || string.length() == 0;
     }
 
-    public static boolean isEmpty(String string) {
-        return string == null || string.equals("");
+    public static String formatAndroidParamName(String name) {
+        char firstChar = name.charAt(0);
+        if (firstChar == 'm') {
+            return name + "Param";
+        } else {
+            if (firstChar >= 'a' && firstChar <= 'z') {
+                return "m" + String.valueOf(firstChar).toUpperCase() + name.substring(1) + "Param";
+            } else {
+                return "m" + name + "Param";
+            }
+        }
+    }
+
+    public static String classNameToParameterName(String className) {
+        return String.valueOf(className.charAt(0)).toLowerCase() + className.substring(1);
     }
 }

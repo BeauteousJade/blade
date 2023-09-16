@@ -1,194 +1,197 @@
 package com.jade.blade
 
-import android.os.Bundle
-import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
-import com.jade.blade.annotation.Inject
-import com.jade.blade.annotation.Injector
+import com.jade.blade.annotation.Provide
+import com.jade.blade.annotation.Provider
 
-@Injector
-class MainActivity : AppCompatActivity() {
+@Provider
+class ProviderContext : BaseProviderTest {
 
-    @Inject("byteValue1", isNullable = true)
-    private var byteValue: Byte = 0
+    @Provide(isProvider = true)
+    private val context2 = ProviderContext2()
 
-    @Inject("shortValue1", isNullable = true)
-    private var shortValue: Short = 0
+    @Provide("shortValue1")
+    private val shortValue: Short = 20
 
-    @Inject(isNullable = true)
-    private var intValue = 0
+    @Provide("shortValue2")
+    private val shortVal: Short = 20
 
-    @Inject
-    private var longValue: Long = 0
+    @Provide
+    private val doubleValue = 50.0
 
-    @Inject
-    private var floatValue = 0f
+    @Provide
+    private val booleanValue = true
 
-    @Inject
-    private var doubleValue = 0.0
+    @Provide
+    private val charValue = 'a'
 
-    @Inject
-    private var booleanValue = false
+    @Provide("str")
+    private val string = "a"
 
-    @Inject
-    private var charValue = '0'
-
-    @Inject(isNullable = true)
-    private var string = ""
-
-
-    @Inject
+    @Provide
     private val object1 = Object()
 
-    @Inject
+    @Provide
     private val object2 = Object()
 
-    @Inject
+    @Provide
     private val object3 = Object()
 
-    @Inject
+    @Provide
     private val object4 = Object()
 
-    @Inject
+    @Provide
     private val object5 = Object()
 
-    @Inject
+    @Provide
     private val object6 = Object()
 
-    @Inject
+    @Provide
     private val object7 = Object()
 
-    @Inject
+    @Provide
     private val object8 = Object()
 
-    @Inject
+    @Provide
     private val object9 = Object()
 
-    @Inject
+    @Provide
     private val object10 = Object()
 
-    @Inject
+    @Provide
     private val object11 = Object()
 
-    @Inject
+    @Provide
     private val object12 = Object()
 
-    @Inject
+    @Provide
     private val object13 = Object()
 
-    @Inject
+    @Provide
     private val object14 = Object()
 
-    @Inject
+    @Provide
     private val object15 = Object()
 
-    @Inject
+    @Provide
     private val object16 = Object()
 
-    @Inject
+    @Provide
     private val object17 = Object()
 
-    @Inject
+    @Provide
     private val object18 = Object()
 
-    @Inject
+    @Provide
     private val object19 = Object()
 
-    @Inject
+    @Provide
     private val object20 = Object()
 
-    @Inject
+    @Provide
     private val object21 = Object()
 
-    @Inject
+    @Provide
     private val object22 = Object()
 
-    @Inject
+    @Provide
     private val object23 = Object()
 
-    @Inject
+    @Provide
     private val object24 = Object()
 
-    @Inject
+    @Provide
     private val object25 = Object()
 
-    @Inject
+    @Provide
     private val object26 = Object()
 
-    @Inject
+    @Provide
     private val object27 = Object()
 
-    @Inject
+    @Provide
     private val object28 = Object()
 
-    @Inject
+    @Provide
     private val object29 = Object()
 
-    @Inject
+    @Provide
     private val object30 = Object()
 
-    @Inject
+    @Provide
     private val object31 = Object()
 
-    @Inject
+    @Provide
     private val object32 = Object()
 
-    @Inject
+    @Provide
     private val object33 = Object()
 
-    @Inject
+    @Provide
     private val object34 = Object()
 
-    @Inject
+    @Provide
     private val object35 = Object()
 
-    @Inject
+    @Provide
     private val object36 = Object()
 
-    @Inject
+    @Provide
     private val object37 = Object()
 
-    @Inject
+    @Provide
     private val object38 = Object()
 
-    @Inject
+    @Provide
     private val object39 = Object()
 
-    @Inject
+    @Provide
     private val object40 = Object()
 
-    @Inject
+    @Provide
     private val object41 = Object()
 
-    @Inject
+    @Provide
     private val object42 = Object()
 
-    @Inject
+    @Provide
     private val object43 = Object()
 
-    @Inject
+    @Provide
     private val object44 = Object()
 
-    @Inject
+    @Provide
     private val object45 = Object()
 
-    @Inject
+    @Provide
     private val object46 = Object()
 
-    @Inject
+    @Provide
     private val object47 = Object()
 
-    @Inject
+    @Provide
     private val object48 = Object()
 
-    @Inject
+    @Provide
     private val object49 = Object()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val time = System.currentTimeMillis()
-        Blade.inject(this, ProviderContext())
-        Log.i("pby123", "test time:${System.currentTimeMillis() - time}")
+    constructor() {
+    }
+
+    constructor(test: String) : super(test) {
+    }
+
+    @Provider
+    private class ProviderContext2 {
+        @Provide("byteValue1")
+        private val byteValue: Byte = 10
+
+        @Provide
+        private val intValue = 30
+
+        @Provide
+        private val longValue: Long = 40
+
+        @Provide
+        private val floatValue = 40f
     }
 }

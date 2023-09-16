@@ -14,3 +14,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "blade"
 include ':app'
+//include ':buildSrc'
+include ':blade'

@@ -2,6 +2,9 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
+import com.jade.blade.BladePlugin
+
+apply plugin: BladePlugin
 
 android {
     namespace 'com.jade.blade'
@@ -37,4 +40,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation project(path: ':blade')
 }

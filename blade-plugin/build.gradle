@@ -1,0 +1,67 @@
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.20'
+    id 'groovy'
+    id 'maven-publish'
+}
+// 如果module 名称是buildSrc,才需要单独增加仓库地址
+if (project.name.equals("buildSrc")) {
+    repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+    }
+}
+dependencies {
+    implementation(gradleApi())
+    implementation("com.android.tools.build:gradle:7.4.1")
+    compileOnly("commons-io:commons-io:2.6")
+    compileOnly("commons-codec:commons-codec:1.15")
+    compileOnly("org.ow2.asm:asm-commons:9.2")
+    compileOnly("org.ow2.asm:asm-tree:9.2")
+}
+
+tasks.named("processResources") {
+    duplicatesStrategy = 'include'
+}
+
+version = '1.0'
+group = 'com.jade.blade.plugin'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            // 版本id，最终会根据这个id-version生成相应的插件
+            artifactId = 'com.jade.blade.plugin'
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            // 生成的插件位置
+            url = uri('../repo')
+        }
+    }
+}
+
+//// Use java-gradle-plugin to generate plugin descriptors and specify plugin ids
+//gradlePlugin {
+//    plugins {
+//        greetingsPlugin {
+//            id = 'com.jade.blade.plugin'  //插件的id，到时候apply的插件id
+//            implementationClass = 'com.jade.blade.plugin.BladePlugin'
+//            displayName = 'Blade Plugin'
+//        }
+//    }
+//}
+//
+//pluginBundle {
+//    website = 'https://github.com/BeauteousJade/blade'
+//    vcsUrl = 'https://github.com/BeauteousJade/blade'
+//    description = 'Blade Plugin is a tools for automatically generating code by ASM'
+//    tags = ['inject', 'ASM']  //插件的tag。可以通过这个在插件门户上搜索
+//}
+tasks.named("processResources") {
+    duplicatesStrategy = 'include'
+}

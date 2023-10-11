@@ -2,9 +2,6 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
-import com.jade.blade.BladePlugin
-
-apply plugin: BladePlugin
 
 android {
     namespace 'com.jade.blade'

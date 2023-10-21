@@ -3,25 +3,11 @@ package com.jade.blade.transform.injector
 import com.jade.blade.info.InjectInfo
 import com.jade.blade.transform.base.BaseClassVisitor
 import com.jade.blade.transform.utils.ClassVisitorUtils
+import com.jade.blade.transform.utils.Quintuple
 import com.jade.blade.transform.utils.TypeMapper
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Label
-import org.objectweb.asm.Opcodes.ACC_FINAL
-import org.objectweb.asm.Opcodes.ACC_PUBLIC
-import org.objectweb.asm.Opcodes.ALOAD
-import org.objectweb.asm.Opcodes.ARETURN
-import org.objectweb.asm.Opcodes.ASTORE
-import org.objectweb.asm.Opcodes.ATHROW
-import org.objectweb.asm.Opcodes.CHECKCAST
-import org.objectweb.asm.Opcodes.DUP
-import org.objectweb.asm.Opcodes.IFNONNULL
-import org.objectweb.asm.Opcodes.IFNULL
-import org.objectweb.asm.Opcodes.INVOKEINTERFACE
-import org.objectweb.asm.Opcodes.INVOKESPECIAL
-import org.objectweb.asm.Opcodes.INVOKEVIRTUAL
-import org.objectweb.asm.Opcodes.NEW
-import org.objectweb.asm.Opcodes.PUTFIELD
-import org.objectweb.asm.Opcodes.RETURN
+import org.objectweb.asm.Opcodes.*
 
 
 class InjectorClassVisitor(
@@ -39,12 +25,13 @@ class InjectorClassVisitor(
             "(Ljava/util/Map<Ljava/lang/String;*>;)V" // signature
         )
 
-        private val requireNonNullFunInfo = Triple(
-            "requireNonNull",
-            "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;",
-            null
+        private val requireNonNullFunInfoInBlade = Quintuple(
+            "com/jade/blade/utils/BladeUtils", // owner
+            "INSTANCE", // objectName
+            "requireNonNull", // methodName
+            "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;", // descriptor
+            null // signature
         )
-
     }
 
 
@@ -72,7 +59,6 @@ class InjectorClassVisitor(
 
     override fun visitEnd() {
         super.visitEnd()
-        addRequireNonNull()
         addSetupDataByBlade()
     }
 
@@ -92,7 +78,7 @@ class InjectorClassVisitor(
             val newMap = fieldMap.keys.groupBy {
                 if (fieldMap[it]!!.isNullable) 1 else 0
             }
-            val commonRunnable = { info:InjectInfo ->
+            val commonRunnable = { info: InjectInfo ->
                 visitVarInsn(ALOAD, 1)
                 visitLdcInsn(info.key)
                 visitMethodInsn(
@@ -103,7 +89,7 @@ class InjectorClassVisitor(
                     true
                 )
             }
-            val castRunnable = {info:InjectInfo->
+            val castRunnable = { info: InjectInfo ->
                 TypeMapper.getRawInfoBy(info.descriptor)?.let {
                     visitTypeInsn(CHECKCAST, it.first)
                     visitMethodInsn(
@@ -123,21 +109,27 @@ class InjectorClassVisitor(
                 val value = fieldMap[key]!!
                 visitVarInsn(ALOAD, 0)
                 visitVarInsn(ALOAD, 0)
+                visitFieldInsn(
+                    GETSTATIC,
+                    requireNonNullFunInfoInBlade.first,
+                    requireNonNullFunInfoInBlade.second,
+                    "L${requireNonNullFunInfoInBlade.first};"
+                )
                 commonRunnable(value)
                 visitLdcInsn(key)
                 visitLdcInsn(value.key)
                 visitMethodInsn(
-                    INVOKESPECIAL,
-                    newClassName,
-                    requireNonNullFunInfo.first,
-                    requireNonNullFunInfo.second,
+                    INVOKEVIRTUAL,
+                    requireNonNullFunInfoInBlade.first,
+                    requireNonNullFunInfoInBlade.third,
+                    requireNonNullFunInfoInBlade.fourth,
                     false
                 )
                 castRunnable(value)
                 visitFieldInsn(PUTFIELD, newClassName, key, value.descriptor)
             }
             var index = 2
-            newMap[1]?.forEach {key ->
+            newMap[1]?.forEach { key ->
                 val value = fieldMap[key]!!
                 commonRunnable(value)
                 visitVarInsn(ASTORE, index)
@@ -155,77 +147,6 @@ class InjectorClassVisitor(
             visitMaxs(3, 2)
             visitEnd()
         }
-    }
-
-    private fun addRequireNonNull() {
-        ClassVisitorUtils.addFunc(
-            cv,
-            requireNonNullFunInfo.first,
-            requireNonNullFunInfo.second,
-            requireNonNullFunInfo.second
-        ) {
-            visitCode()
-            visitVarInsn(ALOAD, 1)
-            val label0 = Label()
-            visitJumpInsn(IFNONNULL, label0)
-            visitTypeInsn(NEW, "java/lang/NullPointerException")
-            visitInsn(DUP)
-            visitTypeInsn(NEW, "java/lang/StringBuilder")
-            visitInsn(DUP)
-            visitMethodInsn(
-                INVOKESPECIAL,
-                "java/lang/StringBuilder",
-                "<init>",
-                "()V",
-                false
-            )
-            visitVarInsn(ALOAD, 2)
-            visitMethodInsn(
-                INVOKEVIRTUAL,
-                "java/lang/StringBuilder",
-                "append",
-                "(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-                false
-            )
-            visitLdcInsn(" is null, key:")
-            visitMethodInsn(
-                INVOKEVIRTUAL,
-                "java/lang/StringBuilder",
-                "append",
-                "(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-                false
-            )
-            visitVarInsn(ALOAD, 3)
-            visitMethodInsn(
-                INVOKEVIRTUAL,
-                "java/lang/StringBuilder",
-                "append",
-                "(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-                false
-            )
-            visitMethodInsn(
-                INVOKEVIRTUAL,
-                "java/lang/StringBuilder",
-                "toString",
-                "()Ljava/lang/String;",
-                false
-            )
-            visitMethodInsn(
-                INVOKESPECIAL,
-                "java/lang/NullPointerException",
-                "<init>",
-                "(Ljava/lang/String;)V",
-                false
-            )
-            visitInsn(ATHROW)
-            visitLabel(label0)
-            visitVarInsn(ALOAD, 1)
-            visitInsn(ARETURN)
-            visitMaxs(4, 4)
-            visitEnd()
-        }
-
-
     }
 
 }

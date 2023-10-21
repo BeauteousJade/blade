@@ -4,10 +4,9 @@ import androidx.annotation.NonNull;
 
 import com.jade.blade.annotation.Provide;
 import com.jade.blade.support.DataProvider;
+import com.jade.blade.utils.BladeUtils;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class TestProvider implements DataProvider {
     @Provide
@@ -31,7 +30,7 @@ public class TestProvider implements DataProvider {
     @Provide
     private Object object = null;
 
-    private Map<String, Object> providerDataMap;
+    private HashMap<String, Object> providerDataMap;
 
     public TestProvider() {
         init();
@@ -39,39 +38,13 @@ public class TestProvider implements DataProvider {
 
     private void init() {
         providerDataMap = new HashMap<>();
-        checkMultipleKey("byteValue");
+        BladeUtils instance = BladeUtils.INSTANCE;
+        instance.checkProvider(providerDataMap, byteValue, "byteValue");
         providerDataMap.put("byteValue", byteValue);
-        checkProvider(byteValue);
-        checkMultipleKey("byteValue");
+        instance.checkProvider(providerDataMap, shortValue, "shortValue");
         providerDataMap.put("shortValue", shortValue);
-        checkProvider(shortValue);
-        providerDataMap.put("intValue", intValue);
-        providerDataMap.put("longValue", longValue);
-        providerDataMap.put("floatValue", floatValue);
-        providerDataMap.put("doubleValue", doubleValue);
-        providerDataMap.put("booleanValue", booleanValue);
-        providerDataMap.put("charValue", charValue);
-        providerDataMap.put("string", string);
-        checkProvider(string);
     }
 
-    private void checkProvider(Object object) {
-        if (object instanceof DataProvider) {
-            HashMap<String, Object> hashMap = ((DataProvider) object).provideDataByBlade();
-            Set<String> keySet = hashMap.keySet();
-            for (String key : keySet) {
-                checkMultipleKey(key);
-            }
-            providerDataMap.putAll(hashMap);
-        }
-    }
-
-
-    private void checkMultipleKey(String key) {
-        if (providerDataMap.containsKey(key)) {
-            throw new IllegalArgumentException("multiple key:" + key);
-        }
-    }
 
     @NonNull
     @Override

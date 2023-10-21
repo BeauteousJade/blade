@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.jade.blade.annotation.Inject;
 import com.jade.blade.support.DataFetcher;
+import com.jade.blade.utils.BladeUtils;
 
 import java.util.Map;
 
@@ -24,9 +25,9 @@ public class TestInjector implements DataFetcher {
 
     @Override
     public void setupDataByBlade(@NonNull Map<String, ?> data) {
-        a = (int) requireNonNull(data.get("test"), "a", "test");
-        b = (double) requireNonNull(data.get("test"), "a", "test");
-        d = (boolean) requireNonNull(data.get("test"), "a", "test");
+        a = (int) BladeUtils.INSTANCE.requireNonNull(data.get("test"), "a", "test");
+        b = (double) BladeUtils.INSTANCE.requireNonNull(data.get("test"), "a", "test");
+        d = (boolean) BladeUtils.INSTANCE.requireNonNull(data.get("test"), "a", "test");
         Object o = data.get("1234");
         if (o != null) {
             b = (double) o;
@@ -39,12 +40,5 @@ public class TestInjector implements DataFetcher {
         if (o != null) {
             b = (double) o1;
         }
-    }
-
-    private Object requireNonNull(Object obj, String fieldName, String key) {
-        if (obj == null) {
-            throw new NullPointerException(fieldName + " is null, key:" + key);
-        }
-        return obj;
     }
 }

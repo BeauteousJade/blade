@@ -1,0 +1,5 @@
+.gradle
+.idea
+annotation/build
+app/build
+inject/build

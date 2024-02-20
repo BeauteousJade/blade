@@ -14,8 +14,7 @@ public class FieldParam<T> implements Param<T> {
 
     @Override
     public void init(T param, String name) {
-        boolean isPrimitive = param.getClass().isPrimitive();
-        if (isPrimitive || param instanceof String) {
+        if (userRef(param)) {
             mParam = param;
             mParamRef = null;
         } else {
@@ -23,6 +22,18 @@ public class FieldParam<T> implements Param<T> {
             mParamRef = new WeakReference<>(param);
         }
         mName = name;
+    }
+
+    private boolean userRef(T param) {
+        return param instanceof Integer ||
+                param instanceof Boolean ||
+                param instanceof Byte ||
+                param instanceof Short ||
+                param instanceof Long ||
+                param instanceof Double ||
+                param instanceof Float ||
+                param instanceof String ||
+                param instanceof Character;
     }
 
     @SuppressWarnings("unchecked")

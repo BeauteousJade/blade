@@ -1,7 +1,10 @@
 package com.blade.pby.injectdemo;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -76,8 +79,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        View view = findViewById(R.id.button);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
         long time1 = System.currentTimeMillis();
         Context context = new Context();
+        context.mActivity = this;
         HashMap<String, Object> map = new HashMap<>();
         Log.i("pby123", "d1 = " + (System.currentTimeMillis() - time1));
         map.put("pby3", "pby3");
@@ -153,6 +167,8 @@ public class MainActivity extends AppCompatActivity {
         @Inject("pby3")
         String pby3;
 
+        @Inject("activity")
+        Activity mActivity;
     }
 
     public class Target2 extends Target {
@@ -186,6 +202,9 @@ public class MainActivity extends AppCompatActivity {
         public Map<String, Object> dataMap = new HashMap<>();
         @Provides(deepProvides = true, value = "context2")
         public Context2 context2 = new Context2();
+
+        @Provides("activity")
+        public Activity mActivity;
 
         {
             dataMap.put("pby1", "pby1");

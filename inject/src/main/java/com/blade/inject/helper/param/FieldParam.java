@@ -6,12 +6,22 @@ import java.lang.ref.WeakReference;
 
 public class FieldParam<T> implements Param<T> {
 
-    private WeakReference<T> mParam;
+    @Nullable
+    private WeakReference<T> mParamRef;
+    @Nullable
+    private T mParam;
     private String mName;
 
     @Override
     public void init(T param, String name) {
-        mParam = new WeakReference<>(param);
+        boolean isPrimitive = param.getClass().isPrimitive();
+        if (isPrimitive || param instanceof String) {
+            mParam = param;
+            mParamRef = null;
+        } else {
+            mParam = null;
+            mParamRef = new WeakReference<>(param);
+        }
         mName = name;
     }
 
@@ -20,11 +30,15 @@ public class FieldParam<T> implements Param<T> {
     @Override
     public <U> U getParam(String name) {
         if (mName.equals(name)) {
-            final T t = mParam.get();
-            if (t == null) {
-                return null;
+            if (mParam != null) {
+                return (U) mParam;
+            } else if (mParamRef != null) {
+                final T t = mParamRef.get();
+                if (t == null) {
+                    return null;
+                }
+                return (U) t;
             }
-            return (U) t;
         }
         return null;
     }

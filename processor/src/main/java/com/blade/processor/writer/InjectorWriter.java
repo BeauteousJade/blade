@@ -81,6 +81,7 @@ public class InjectorWriter implements Writer {
         ParameterSpec.Builder objectBuilder = ParameterSpec.builder(Object[].class, "sources");
         MethodSpec.Builder methodBuilder = MethodUtils.buildOverrideMethod(INJECT_METHOD_NAME,
                 Modifier.PUBLIC, void.class, targetBuilder.build(), objectBuilder.build()).varargs(true);
+        methodBuilder.addStatement("$T.initFetcher($L)", getFetchHolder(), sourcesName);
         for (FieldEntry fieldEntry : classEntry.getFieldEntryList()) {
             if (fieldEntry.isPrimitive()) {
                 methodBuilder.addStatement("$L.$L = ($L)$T.getPrimitive($T.fetch($S, $L), $L)", targetName,

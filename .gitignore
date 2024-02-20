@@ -3,3 +3,4 @@
 annotation/build
 app/build
 inject/build
+processor/build

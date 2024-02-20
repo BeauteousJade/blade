@@ -13,6 +13,7 @@ public class DeepProviderFieldParam<T> implements Param<T> {
     public void init(T param, String name) {
         mParam = param;
         mName = name;
+        FetcherHolder.initFetcher(mParam);
     }
 
     @SuppressWarnings("unchecked")
